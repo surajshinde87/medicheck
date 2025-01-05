@@ -35,6 +35,7 @@ const logout = ()=>{
             <li className='py-1'>Contact</li>
             <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
         </NavLink>
+        <a className='py-1 border border-primary rounded-full px-3' href="https://medicheck-panel.netlify.app/">Admin</a>
       </ul>
       {/* Create Account Button */}
       <div className='flex items-center gap-4'>

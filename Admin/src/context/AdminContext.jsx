@@ -1,116 +1,124 @@
 import axios from "axios";
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
 
-export const AdminContext = createContext()
+// Create AdminContext
+export const AdminContext = createContext();
 
-const AdminContextProvider = (props) => {
+// Define AdminContextProvider as a React component
+const AdminContextProvider = ({ children }) => {
+    const [aToken, setAToken] = useState(localStorage.getItem("aToken"));
+    const [doctors, setDoctors] = useState([]);
+    const [appointments, setAppointments] = useState([]);
+    const [dashData, setDashData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const [aToken, setAToken] = useState(localStorage.getItem('aToken')?localStorage.getItem('aToken'): " ");
-    const [doctors, setDoctors] = useState([])
-    const [appointments, setAppointments] = useState([])
-    const [dashData, setDashData] = useState([])
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL
+    useEffect(() => {
+        if (aToken) {
+            localStorage.setItem("aToken", aToken);
+        } else {
+            localStorage.removeItem("aToken");
+        }
+        setLoading(false);
+    }, [aToken]);
 
-    const getAllDoctors = async ()=>{
-try {
-    const { data } = await axios.post(`${backendUrl}/api/admin/all-doctors`, {}, { headers: { Authorization: `Bearer ${aToken}` } });
+    const axiosInstance = axios.create({
+        baseURL: backendUrl,
+        headers: { Authorization: `Bearer ${aToken}` },
+    });
 
-    if(data.success) {
-setDoctors(data.doctors)
-// console.log(data.doctors);
-
-    }else{
-        toast.error(data.message)
-    }
-
-} catch (error) {
-    toast.error(error.message)
-}
-    }
-
-    const changeAvailability = async (docId) =>{
+    const getAllDoctors = async () => {
         try {
-            const { data } = await axios.post(`${backendUrl}/api/admin/change-availability`, {docId}, { headers: { Authorization: `Bearer ${aToken}` } });
-            if(data.success){
-                toast.success(data.message)
-                getAllDoctors()
-            }else{
-                toast.error(data.message)
+            const { data } = await axiosInstance.post("/api/admin/all-doctors");
+            if (data.success) {
+                setDoctors(data.doctors);
+            } else {
+                toast.error(data.message);
             }
         } catch (error) {
-            toast.error(error.message)
+            toast.error(error.response?.data?.message || error.message);
         }
-    }
+    };
 
-    const getAllAppointments = async ()=>{
+    const changeAvailability = async (docId) => {
         try {
-            const { data } = await axios.get(`${backendUrl}/api/admin/appointments`, { headers: { Authorization: `Bearer ${aToken}` } });
-            if(data.success) {
-                setAppointments(data.appointments)
-                // console.log(data.appointments);
-                
-            } else{
-                toast.error(data.message)
+            const { data } = await axiosInstance.post("/api/admin/change-availability", { docId });
+            if (data.success) {
+                toast.success(data.message);
+                getAllDoctors();
+            } else {
+                toast.error(data.message);
             }
-        } catch(error){
-            toast.error(error.message)
+        } catch (error) {
+            toast.error(error.response?.data?.message || error.message);
         }
-    }
+    };
 
-    const cancelAppointments = async (appointmentId) =>{
-try {
-    const {data} = await axios.post(`${backendUrl}/api/admin/cancel-appointment`,{appointmentId}, { headers: { Authorization: `Bearer ${aToken}` } });
- if(data.success){
-    toast.success(data.message)
-    getAllAppointments()
- }else{
-    toast.error(data.message)
- }
-} catch (error) {
-    toast.error(error.message)
-}
-    }
-
-// Dashboard API Calling
-    const getDashboardData = async ()=>{
+    const getAllAppointments = async () => {
         try {
-            const { data } = await axios.get(`${backendUrl}/api/admin/dashboard`, { headers: { Authorization: `Bearer ${aToken}` } });
-            if(data.success) {
-                setDashData(data.dashData)
-                // console.log(data.dashData);
-                
-            } else{
-                toast.error(data.message)
+            const { data } = await axiosInstance.get("/api/admin/appointments");
+            if (data.success) {
+                setAppointments(data.appointments.reverse());
+            } else {
+                toast.error(data.message);
             }
-        } catch(error){
-            toast.error(error.message)
+        } catch (error) {
+            toast.error(error.response?.data?.message || error.message);
         }
-    }
+    };
 
+    const cancelAppointments = async (appointmentId) => {
+        try {
+            const { data } = await axiosInstance.post("/api/admin/cancel-appointment", { appointmentId });
+            if (data.success) {
+                toast.success(data.message);
+                getAllAppointments();
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || error.message);
+        }
+    };
+
+    const getDashboardData = async () => {
+        try {
+            const { data } = await axiosInstance.get("/api/admin/dashboard");
+            if (data.success) {
+                setDashData(data.dashData);
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || error.message);
+        }
+    };
 
     const value = {
- aToken,
- setAToken,
- backendUrl,
- doctors,
- getAllDoctors,
- changeAvailability,
- appointments,
- setAppointments,
- getAllAppointments,
- cancelAppointments,
- dashData,
- getDashboardData
+        aToken,
+        setAToken,
+        backendUrl,
+        doctors,
+        getAllDoctors,
+        changeAvailability,
+        appointments,
+        setAppointments,
+        getAllAppointments,
+        cancelAppointments,
+        dashData,
+        getDashboardData,
+    };
 
+    if (loading) {
+        return <div>Loading...</div>;
     }
-     return (
-         <AdminContext.Provider value={value}>
-             {props.children}
-         </AdminContext.Provider>
-     )
-}
+
+  
+
+    return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;
+};
 
 export default AdminContextProvider;

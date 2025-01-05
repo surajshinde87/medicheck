@@ -1,7 +1,15 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { assets } from '../assets/assets'
-
+import { NavLink, useLocation} from 'react-router-dom'
 const Footer = () => {
+  const location = useLocation()
+
+  useEffect(() => {
+    // Scroll to the top of the page whenever the route changes
+    window.scrollTo(0, 0);
+  }, [location]);
+
+
   return (
     <div className='md:mx-10'>
       <div className='flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10 mt-40 text-sm'>
@@ -15,10 +23,22 @@ const Footer = () => {
         <div>
       <p className='text-xl font-medium mb-5'>Company</p>
       <ul className='flex flex-col gap-2 text-gray-600'>
-        <li>Home</li>
-        <li>About Us</li>
-        <li>Contact Us</li>
-        <li>Privacy Policy</li>
+         <NavLink to={'/'}>
+                 <li className='py-1'>Home</li>
+                 <hr className='border-none outline-none h-1 bg-primary w-5  hidden' />
+             </NavLink>
+             <NavLink to={'/doctors'}>
+                 <li className='py-1'>All Doctors</li>
+                 <hr className='border-none outline-none h-1 bg-primary w-5  hidden' />
+             </NavLink>
+             <NavLink to={'/about'}>
+                 <li className='py-1'>About</li>
+                 <hr className='border-none outline-none h-1 bg-primary w-5  hidden' />
+             </NavLink>
+             <NavLink to={'/contact'}>
+                 <li className='py-1 inline-block'>Contact</li>
+                 <hr className='border-none outline-none h-1 bg-primary w-5  hidden mb-4' />
+             </NavLink>
       </ul>
         </div>
 
