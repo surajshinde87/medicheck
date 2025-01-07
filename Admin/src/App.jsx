@@ -51,7 +51,7 @@ const App = () => {
           <Route path="/doctor-appointments" element={<DoctorAppointment />} />
           <Route path="/doctor-profile" element={<DoctorProfile />} />
          <Route path='/login' element={<Login />} />
-         <Route path='/' element={<Login />} />
+      
           {/* Fallback Route */}
  
         </Routes>
