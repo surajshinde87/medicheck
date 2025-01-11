@@ -33,9 +33,10 @@ const Navbar = () => {
   return (
     <div className='flex justify-between items-center px-4 border-b bg-white'>
     <div className='flex items-center gap-2 text-xs'>
+        <a href="https://medichecks.netlify.app/">                                   
         <img className='w-72 cursor-pointer' src={assets.admin_logo} alt="Admin Logo" />
+        </a>
         <p className='border border-gray-300 text-gray-500 px-2.5 rounded-full text-xl '>{aToken ? "Admin" : "Doctor"}</p>
-        <a className='text-blue-500 text-xl underline' href="https://medichecks.netlify.app/">Main Website</a>
     </div>
     <button onClick={logout} className='bg-primary text-white text-sm px-10 py-2 rounded-full font-semibold'>Logout</button>
     </div>
